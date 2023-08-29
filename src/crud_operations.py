@@ -2,156 +2,180 @@ from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
 from models import FoodItem, Meal, MealFood
 from datetime import datetime
-from sqlalchemy import exc
-
 
 DATABASE_URI = 'sqlite:///calories_tracker.db'
 engine = create_engine(DATABASE_URI)
-Session = sessionmaker(bind=engine)
-session = Session()
+SessionLocal = sessionmaker(bind=engine)
 
 
 def add_food_item(name, calories):
-    session = Session()
+    session = SessionLocal()
     try:
         new_item = FoodItem(name=name, calories=calories)
         session.add(new_item)
         session.commit()
-    except exc.IntegrityError:  # Handles unique constraint
-        session.rollback()
-        return False
-    finally:
-        session.close()
-    return True
-
-
-def add_meal(name, date):
-    session = Session()
-    try:
-        new_meal = Meal(name=name, date=date)
-        session.add(new_meal)
-        session.commit()
+        return True, "Food item added successfully!"
     except exc.IntegrityError:
         session.rollback()
-        return False
+        return False, "A food item with this name already exists."
     finally:
         session.close()
-    return True
+
+
+def add_meal(name, calories):
+    session = SessionLocal()
+    try:
+        food_item = session.query(FoodItem).filter_by(name=name).first()
+        if not food_item:
+            food_item = FoodItem(name=name, calories=calories)
+            session.add(food_item)
+        
+        meal = Meal(name=name)
+        session.add(meal)
+        session.flush()
+
+        meal_food = MealFood(meal_id=meal.id, food_item_id=food_item.id)
+        session.add(meal_food)
+        session.commit()
+
+        return True, "Meal added successfully!"
+    except exc.IntegrityError:
+        session.rollback()
+        return False, "An error occurred while adding the meal."
+    finally:
+        session.close()
+
 
 def view_food_items():
-    session = Session()
-    items = session.query(FoodItem).all()
-    session.close()
-    return items
+    session = SessionLocal()
+    try:
+        items = session.query(FoodItem).all()
+        return items
+    finally:
+        session.close()
+
 
 def view_meals():
-    session = Session()
-    meals = session.query(Meal).all()
-    session.close()
-    return meals
+    session = SessionLocal()
+    try:
+        meals = session.query(Meal).all()
+        return meals
+    finally:
+        session.close()
+
 
 def update_food_item(food_id, new_name, new_calories):
-    session = Session()
+    session = SessionLocal()
     try:
         item = session.query(FoodItem).filter_by(id=food_id).first()
         if item:
             item.name = new_name
             item.calories = new_calories
             session.commit()
+            return True, "Food item updated successfully!"
         else:
-            return False
+            return False, "Food item not found."
     except exc.IntegrityError:
         session.rollback()
-        return False
+        return False, "An error occurred during the update."
     finally:
         session.close()
-    return True
 
 
 def delete_food_item(food_id):
-    session = Session()
+    session = SessionLocal()
     try:
         item = session.query(FoodItem).filter_by(id=food_id).first()
         if item:
             session.delete(item)
             session.commit()
+            return True, "Food item deleted successfully!"
         else:
-            return False
+            return False, "Food item not found."
     except exc.IntegrityError:
         session.rollback()
-        return False
+        return False, "An error occurred during the deletion."
     finally:
         session.close()
-    return True
 
 
 def add_food_to_meal(meal_id, food_id, portion_size):
-    session = Session()
+    session = SessionLocal()
     try:
         meal_food = MealFood(meal_id=meal_id, food_item_id=food_id, portion_size=portion_size)
         session.add(meal_food)
         session.commit()
+        return True, "Food added to meal successfully!"
     except exc.IntegrityError:
         session.rollback()
-        return False
+        return False, "An error occurred while adding food to the meal."
     finally:
         session.close()
-    return True
 
 
 def view_foods_in_meal(meal_id):
-    session = Session()
-    foods = session.query(FoodItem).join(MealFood).join(Meal).filter(Meal.id == meal_id).all()
-    session.close()
-    return foods
+    session = SessionLocal()
+    try:
+        foods = session.query(FoodItem).join(MealFood).join(Meal).filter(Meal.id == meal_id).all()
+        return foods
+    finally:
+        session.close()
+
 
 def remove_food_from_meal(meal_id, food_id):
-    session = Session()
+    session = SessionLocal()
     try:
         meal_food = session.query(MealFood).filter_by(meal_id=meal_id, food_item_id=food_id).first()
         if meal_food:
             session.delete(meal_food)
             session.commit()
+            return True, "Food removed from meal successfully!"
         else:
-            return False
+            return False, "Food not found in the meal."
     except exc.IntegrityError:
         session.rollback()
-        return False
+        return False, "An error occurred while removing food from the meal."
     finally:
         session.close()
-    return True
+
 
 def update_portion_in_meal(meal_id, food_id, new_portion_size):
-    session = Session()
+    session = SessionLocal()
     try:
         meal_food = session.query(MealFood).filter_by(meal_id=meal_id, food_item_id=food_id).first()
         if meal_food:
             meal_food.portion_size = new_portion_size
             session.commit()
+            return True, "Portion size updated successfully!"
         else:
-            return False
+            return False, "Food not found in the meal."
     except exc.IntegrityError:
         session.rollback()
-        return False
+        return False, "An error occurred during the update."
     finally:
         session.close()
-    return True
 
 
 def search_meal_by_name(name):
+    session = SessionLocal()
     try:
         result = session.query(Meal).filter(Meal.name.like(f"%{name}%")).all()
-        for meal in result:
-            print(f"ID: {meal.id} - Name: {meal.name} - Calories: {meal.calories}")
-    except exc.SQLAlchemyError as e:
-        print(f"An error occurred: {str(e)}")
+        return result
+    except exc.SQLAlchemyError:
+        return []
+    finally:
+        session.close()
 
 
 def total_calories_today():
     today = datetime.today().date()
+    session = SessionLocal()
     try:
         meals_today = session.query(Meal).filter(Meal.date == today).all()
         total_calories = sum([meal.calories for meal in meals_today])
-        print(f"Total calories consumed today: {total_calories}")
-    except exc.SQLAlchemyError as e:
-        print(f"An error occurred: {str(e)}")
+        return total_calories
+    except exc.SQLAlchemyError:
+        return None
+    finally:
+        session.close()
+

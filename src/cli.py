@@ -1,6 +1,6 @@
 from crud_operations import (add_meal, view_food_items, view_meals, update_food_item, delete_food_item, search_meal_by_name, total_calories_today)
+from config import SessionLocal
 
-from config import session
 
 
 def get_valid_number(prompt_message):
@@ -14,10 +14,11 @@ def get_valid_number(prompt_message):
 def get_valid_string(prompt_message):
     while True:
         value = input(prompt_message)
-        if value.isalpha():
-            return value.strip()  
+        if all(c.isalpha() or c.isspace() for c in value):  
+            return value
         else:
-            print("Please enter a string without any symbols or numbers!")
+            print("Please enter a valid string!")
+
 
 def get_valid_choice(prompt_message, valid_choices):
     while True:
