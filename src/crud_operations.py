@@ -46,3 +46,36 @@ def view_meals():
     session.close()
     return meals
 
+def update_food_item(food_id, new_name, new_calories):
+    session = Session()
+    try:
+        item = session.query(FoodItem).filter_by(id=food_id).first()
+        if item:
+            item.name = new_name
+            item.calories = new_calories
+            session.commit()
+        else:
+            return False
+    except exc.IntegrityError:
+        session.rollback()
+        return False
+    finally:
+        session.close()
+    return True
+
+
+def delete_food_item(food_id):
+    session = Session()
+    try:
+        item = session.query(FoodItem).filter_by(id=food_id).first()
+        if item:
+            session.delete(item)
+            session.commit()
+        else:
+            return False
+    except exc.IntegrityError:
+        session.rollback()
+        return False
+    finally:
+        session.close()
+    return True
