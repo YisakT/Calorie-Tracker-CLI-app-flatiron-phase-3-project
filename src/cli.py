@@ -1,4 +1,4 @@
-from crud_operations import (add_meal, view_food_items, view_meals, update_food_item, delete_food_item)
+from crud_operations import (add_meal, view_food_items, view_meals, update_food_item, delete_food_item, search_meal_by_name, total_calories_today)
 from models import session
 
 def get_valid_number(prompt_message):
@@ -13,7 +13,7 @@ def get_valid_string(prompt_message):
     while True:
         value = input(prompt_message)
         if value.isalpha():
-            return value
+            return value.strip()  
         else:
             print("Please enter a string without any symbols or numbers!")
 
@@ -33,9 +33,11 @@ def main():
         print("3. View meals")
         print("4. Update food item")
         print("5. Delete food item")
-        print("6. Exit")
+        print("6. Search meal by name")
+        print("7. View total calories for today")
+        print("8. Exit")
         
-        choice = get_valid_choice("Enter your choice: ", ["1", "2", "3", "4", "5", "6"])
+        choice = get_valid_choice("Enter your choice: ", ["1", "2", "3", "4", "5", "6", "7", "8"])
 
         if choice == "1":
             name = get_valid_string("Enter meal name: ")
@@ -54,6 +56,11 @@ def main():
             food_id = get_valid_number("Enter food item ID to delete: ")
             delete_food_item(food_id)
         elif choice == "6":
+            name = get_valid_string("Enter the name of the meal to search: ")
+            search_meal_by_name(name)
+        elif choice == "7":
+            total_calories_today()
+        elif choice == "8":
             print("Exiting the Calorie Tracker CLI. Goodbye!")
             session.close()  
             break
