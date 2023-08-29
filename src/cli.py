@@ -1,5 +1,7 @@
 from crud_operations import (add_meal, view_food_items, view_meals, update_food_item, delete_food_item, search_meal_by_name, total_calories_today)
-from models import session
+
+from config import session
+
 
 def get_valid_number(prompt_message):
     while True:
