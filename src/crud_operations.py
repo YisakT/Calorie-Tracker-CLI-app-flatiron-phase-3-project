@@ -100,3 +100,35 @@ def view_foods_in_meal(meal_id):
     foods = session.query(FoodItem).join(MealFood).join(Meal).filter(Meal.id == meal_id).all()
     session.close()
     return foods
+
+def remove_food_from_meal(meal_id, food_id):
+    session = Session()
+    try:
+        meal_food = session.query(MealFood).filter_by(meal_id=meal_id, food_item_id=food_id).first()
+        if meal_food:
+            session.delete(meal_food)
+            session.commit()
+        else:
+            return False
+    except exc.IntegrityError:
+        session.rollback()
+        return False
+    finally:
+        session.close()
+    return True
+
+def remove_food_from_meal(meal_id, food_id):
+    session = Session()
+    try:
+        meal_food = session.query(MealFood).filter_by(meal_id=meal_id, food_item_id=food_id).first()
+        if meal_food:
+            session.delete(meal_food)
+            session.commit()
+        else:
+            return False
+    except exc.IntegrityError:
+        session.rollback()
+        return False
+    finally:
+        session.close()
+    return True
