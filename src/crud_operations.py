@@ -117,12 +117,12 @@ def remove_food_from_meal(meal_id, food_id):
         session.close()
     return True
 
-def remove_food_from_meal(meal_id, food_id):
+def update_portion_in_meal(meal_id, food_id, new_portion_size):
     session = Session()
     try:
         meal_food = session.query(MealFood).filter_by(meal_id=meal_id, food_item_id=food_id).first()
         if meal_food:
-            session.delete(meal_food)
+            meal_food.portion_size = new_portion_size
             session.commit()
         else:
             return False
