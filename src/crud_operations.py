@@ -1,10 +1,14 @@
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
 from models import FoodItem, Meal, MealFood
+from datetime import datetime
+from sqlalchemy import exc
+
 
 DATABASE_URI = 'sqlite:///calories_tracker.db'
 engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
+session = Session()
 
 
 def add_food_item(name, calories):
@@ -132,3 +136,22 @@ def update_portion_in_meal(meal_id, food_id, new_portion_size):
     finally:
         session.close()
     return True
+
+
+def search_meal_by_name(name):
+    try:
+        result = session.query(Meal).filter(Meal.name.like(f"%{name}%")).all()
+        for meal in result:
+            print(f"ID: {meal.id} - Name: {meal.name} - Calories: {meal.calories}")
+    except exc.SQLAlchemyError as e:
+        print(f"An error occurred: {str(e)}")
+
+
+def total_calories_today():
+    today = datetime.today().date()
+    try:
+        meals_today = session.query(Meal).filter(Meal.date == today).all()
+        total_calories = sum([meal.calories for meal in meals_today])
+        print(f"Total calories consumed today: {total_calories}")
+    except exc.SQLAlchemyError as e:
+        print(f"An error occurred: {str(e)}")
