@@ -33,3 +33,16 @@ def add_meal(name, date):
     finally:
         session.close()
     return True
+
+def view_food_items():
+    session = Session()
+    items = session.query(FoodItem).all()
+    session.close()
+    return items
+
+def view_meals():
+    session = Session()
+    meals = session.query(Meal).all()
+    session.close()
+    return meals
+
