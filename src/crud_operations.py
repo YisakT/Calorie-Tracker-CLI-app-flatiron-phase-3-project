@@ -79,3 +79,24 @@ def delete_food_item(food_id):
     finally:
         session.close()
     return True
+
+
+def add_food_to_meal(meal_id, food_id, portion_size):
+    session = Session()
+    try:
+        meal_food = MealFood(meal_id=meal_id, food_item_id=food_id, portion_size=portion_size)
+        session.add(meal_food)
+        session.commit()
+    except exc.IntegrityError:
+        session.rollback()
+        return False
+    finally:
+        session.close()
+    return True
+
+
+def view_foods_in_meal(meal_id):
+    session = Session()
+    foods = session.query(FoodItem).join(MealFood).join(Meal).filter(Meal.id == meal_id).all()
+    session.close()
+    return foods
