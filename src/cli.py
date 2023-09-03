@@ -46,26 +46,29 @@ def main():
             success, message = add_meal(name, calories)
             print(message)
         elif choice == "2":
-            food_items = view_food_items(3)
+            food_items = view_food_items()
             for item in food_items:
                 print(f"ID: {item.id}, Name: {item.name}, Calories: {item.calories}")
         elif choice == "3":
             meals = view_meals()
-            for meal in meals:
-                print(f"ID: {meal.id}, Name: {meal.name}, Date: {meal.date}")
+            if isinstance(meals,str):
+                print(meals)
+            else:
+                for meal in meals:
+                  print(f"ID: {meal.id}, Name: {meal.name}, Date: {meal.date}")
         elif choice == "4":
             food_id = get_valid_number("Enter food item ID to update: ")
             new_name = get_valid_string("Enter new name for the food item: ")
             new_calories = get_valid_number("Enter new calorie count: ")
-            success, message = update_food_item(session, food_id, new_name, new_calories)
+            success, message = update_food_item(food_id, new_name, new_calories)
             print(message)
         elif choice == "5":
             food_id = get_valid_number("Enter food item ID to delete: ")
-            success, message = delete_food_item(session, food_id)
+            success, message = delete_food_item(food_id)
             print(message)
         elif choice == "6":
             name = get_valid_string("Enter the name of the meal to search: ")
-            meals = search_meal_by_name(session, name)
+            meals = search_meal_by_name(name)
             for meal in meals:
                 print(f"ID: {meal.id}, Name: {meal.name}, Date: {meal.date}")
         elif choice == "7":

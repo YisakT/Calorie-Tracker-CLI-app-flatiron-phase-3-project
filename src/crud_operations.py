@@ -59,6 +59,8 @@ def view_meals():
     session = SessionLocal()
     try:
         meals = session.query(Meal).all()
+        if not meals:
+            return "No meals available. Please add a meal."
         return meals
     finally:
         session.close()
@@ -87,6 +89,11 @@ def delete_food_item(food_id):
     try:
         item = session.query(FoodItem).filter_by(id=food_id).first()
         if item:
+            # Delete or update associated MealFood instances
+            meal_foods = session.query(MealFood).filter_by(food_item_id=food_id).all()
+            for meal_food in meal_foods:
+                session.delete(meal_food)
+
             session.delete(item)
             session.commit()
             return True, "Food item deleted successfully!"
@@ -97,6 +104,7 @@ def delete_food_item(food_id):
         return False, "An error occurred during the deletion."
     finally:
         session.close()
+
 
 
 def add_food_to_meal(meal_id, food_id, portion_size):
