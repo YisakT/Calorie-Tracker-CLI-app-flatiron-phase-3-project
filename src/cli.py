@@ -46,11 +46,11 @@ def main():
             success, message = add_meal(name, calories)
             print(message)
         elif choice == "2":
-            food_items = view_food_items(session)
+            food_items = view_food_items(3)
             for item in food_items:
                 print(f"ID: {item.id}, Name: {item.name}, Calories: {item.calories}")
         elif choice == "3":
-            meals = view_meals(session)
+            meals = view_meals()
             for meal in meals:
                 print(f"ID: {meal.id}, Name: {meal.name}, Date: {meal.date}")
         elif choice == "4":
