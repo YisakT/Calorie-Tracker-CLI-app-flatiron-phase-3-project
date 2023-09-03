@@ -55,7 +55,9 @@ def main():
                 print(meals)
             else:
                 for meal in meals:
-                  print(f"ID: {meal.id}, Name: {meal.name}, Date: {meal.date}")
+                  formatted_date = meal.date.strftime("%Y-%m-%d")
+                  print(f"ID: {meal.id}, Name: {meal.name}, Date: {formatted_date}")
+                  
         elif choice == "4":
             food_id = get_valid_number("Enter food item ID to update: ")
             new_name = get_valid_string("Enter new name for the food item: ")
@@ -72,7 +74,7 @@ def main():
             for meal in meals:
                 print(f"ID: {meal.id}, Name: {meal.name}, Date: {meal.date}")
         elif choice == "7":
-            calories = total_calories_today(session)
+            calories = total_calories_today()
             print(f"Total calories consumed today: {calories}")
         elif choice == "8":
             print("Exiting the Calorie Tracker CLI. Goodbye!")

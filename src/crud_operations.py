@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine, exc, func
 from sqlalchemy.orm import sessionmaker
 from models import FoodItem, Meal, MealFood
 from datetime import datetime
+import pytz
 
 DATABASE_URI = 'sqlite:///calories_tracker.db'
 engine = create_engine(DATABASE_URI)
@@ -30,7 +31,10 @@ def add_meal(name, calories):
             food_item = FoodItem(name=name, calories=calories)
             session.add(food_item)
         
-        meal = Meal(name=name)
+        # Get the current date without the time
+        today_date = datetime.today().date()
+
+        meal = Meal(name=name, date=today_date)
         session.add(meal)
         session.flush()
 
@@ -94,6 +98,18 @@ def delete_food_item(food_id):
             for meal_food in meal_foods:
                 session.delete(meal_food)
 
+            # Update or delete associated Meal instances
+            meals_with_deleted_food = session.query(Meal).join(Meal.meal_foods).filter(
+                MealFood.food_item_id == food_id
+            ).all()
+            for meal in meals_with_deleted_food:
+                if len(meal.meal_foods) > 1:
+                    meal_foods_to_remove = [mf for mf in meal.meal_foods if mf.food_item_id == food_id]
+                    for meal_food in meal_foods_to_remove:
+                        session.delete(meal_food)
+                else:
+                    session.delete(meal)
+
             session.delete(item)
             session.commit()
             return True, "Food item deleted successfully!"
@@ -104,6 +120,7 @@ def delete_food_item(food_id):
         return False, "An error occurred during the deletion."
     finally:
         session.close()
+
 
 
 
@@ -175,15 +192,20 @@ def search_meal_by_name(name):
         session.close()
 
 
+
+
 def total_calories_today():
     today = datetime.today().date()
     session = SessionLocal()
     try:
-        meals_today = session.query(Meal).filter(Meal.date == today).all()
-        total_calories = sum([meal.calories for meal in meals_today])
+        meals_today = session.query(Meal).filter(func.date(Meal.date) == today).all()
+        total_calories = sum([sum([meal_food.food_item.calories for meal_food in meal.food_items]) for meal in meals_today])
         return total_calories
-    except exc.SQLAlchemyError:
+    except exc.SQLAlchemyError as e:
+        print("Error:", e)
         return None
     finally:
         session.close()
+
+
 
