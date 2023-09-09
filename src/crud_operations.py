@@ -99,16 +99,9 @@ def delete_food_item(food_id):
                 session.delete(meal_food)
 
             # Update or delete associated Meal instances
-            meals_with_deleted_food = session.query(Meal).join(Meal.meal_foods).filter(
-                MealFood.food_item_id == food_id
-            ).all()
+            meals_with_deleted_food = session.query(Meal).filter(Meal.food_items.any(food_item_id=food_id)).all()
             for meal in meals_with_deleted_food:
-                if len(meal.meal_foods) > 1:
-                    meal_foods_to_remove = [mf for mf in meal.meal_foods if mf.food_item_id == food_id]
-                    for meal_food in meal_foods_to_remove:
-                        session.delete(meal_food)
-                else:
-                    session.delete(meal)
+                meal.food_items = [mf for mf in meal.food_items if mf.food_item_id != food_id]
 
             session.delete(item)
             session.commit()
