@@ -28,7 +28,7 @@ To use the Calorie Tracker CLI App, follow these instructions:
 1. **Navigate to the `src` directory** of the project:
 
 
-2. **Run the CLI app**:
+2. **Run the CLI app**: Execute the cli.py script from the terminal `phython cli.py`
 
 
 - **Adding a Meal:** Choose option 1: "Add a meal." Enter the meal name and the calorie count for the meal.
