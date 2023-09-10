@@ -10,6 +10,11 @@ Before using the Calorie Tracker CLI App, make sure you have the following prere
 
 - Python 3.x
 - SQLite (for the database)
+  
+Additionally, you will need the `pytz` library.
+install it using pip:
+```bash
+pip install pytz
 
 ### Installation
 
