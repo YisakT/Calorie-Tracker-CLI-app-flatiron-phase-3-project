@@ -13,8 +13,8 @@ Before using the Calorie Tracker CLI App, make sure you have the following prere
   
 Additionally, you will need the `pytz` library.
 install it using pip:
-```bash
-pip install pytz
+
+`pip install pytz`
 
 ### Installation
 
