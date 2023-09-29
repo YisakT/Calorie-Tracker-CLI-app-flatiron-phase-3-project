@@ -1,3 +1,5 @@
-Phase 3 proect video URL
+Calorie tracker CLI app
 
-*coming soon*
+Flatiron Phase 3 project walk through video link.
+
+https://youtu.be/X-yJsCabwEs)https://youtu.be/X-yJsCabwEs

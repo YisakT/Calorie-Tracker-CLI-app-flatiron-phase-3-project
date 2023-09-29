@@ -10,6 +10,11 @@ Before using the Calorie Tracker CLI App, make sure you have the following prere
 
 - Python 3.x
 - SQLite (for the database)
+  
+Additionally, you will need the `pytz` library.
+install it using pip:
+
+`pip install pytz`
 
 ### Installation
 
@@ -28,7 +33,7 @@ To use the Calorie Tracker CLI App, follow these instructions:
 1. **Navigate to the `src` directory** of the project:
 
 
-2. **Run the CLI app**:
+2. **Run the CLI app**: Execute the cli.py script from the terminal `phython cli.py`
 
 
 - **Adding a Meal:** Choose option 1: "Add a meal." Enter the meal name and the calorie count for the meal.
